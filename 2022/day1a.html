@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+
+            let allElfCalories = input.split("\n\n").map(x => x.split("\n"));
+            let summedCalories = allElfCalories.map(
+                elfCalories => elfCalories.reduce(
+                    (total, current) => Number(total) + Number(current)
+                )
+            );
+
+            let mostCalories = -Infinity;
+            for (let i = 0; i < summedCalories.length; i++) {
+                let calories = summedCalories[i];
+                if (calories > mostCalories) {
+                    mostCalories = calories;
+                }
+            }
+
+            console.log(mostCalories);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+
+            let rucksacks = input.split("\n");
+
+            /** @type [string, string, string][] */
+            let groups = [];
+            for (let i = 0; i < rucksacks.length; i += 3) {
+                groups.push([rucksacks[i], rucksacks[i + 1], rucksacks[i + 2]]);
+            }
+
+            let common = groups.map(([g1, g2, g3]) => {
+                for (let i = 0; i < g1.length; i++) {
+                    if (g2.indexOf(g1[i]) > -1 && g3.indexOf(g1[i]) > -1) {
+                        // char is in g2 and g3
+                        return g1[i];
+                    }
+                }
+                return " ";
+            });
+
+            let priorities = common.map(d => {
+                let charCode = d.charCodeAt(0);
+                if (charCode >= 65 && charCode <= 65 + 25) {
+                    return charCode - 65 + 27;
+                } else if (charCode >= 97 && charCode <= 97 + 25) {
+                    return charCode - 97 + 1;
+                } else {
+                    return 0;
+                }
+            });
+
+            let sum = priorities.reduce((total, x) => total + x);
+
+            console.log({rucksacks, groups, common, priorities});
+            console.log(sum);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+
+            /** @type [[string, string], [string, string]][] */
+            let sections = input.split("\n")
+                .map(pair => pair.split(",").map(sec => sec.split("-")));
+
+            let overlappings = sections.map(([[min1, max1], [min2, max2]]) => {
+                return +min2 <= +max1 && +min1 <= +max2
+                    || +max1 <= +min2 && +max2 <= +min1;
+            });
+
+            let overlapAmount = overlappings.reduce(
+                (total, x) => total + Number(x), 0);
+
+            console.log(overlapAmount);
+        }
+    </script>
+</body>
+
+</html>

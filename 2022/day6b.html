@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+
+            outer:
+            for (let i = 0; i < input.length - 13; i++) {
+                let substring = input.slice(i, i + 14);
+                let letters = substring.split("").sort();
+
+                for (let j = 0; j < letters.length - 1; j++) {
+                    if (letters[j] === letters[j + 1]) {
+                        continue outer;
+                    }
+                }
+
+                console.log(i + 14);
+                return;
+            }
+        }
+    </script>
+</body>
+
+</html>

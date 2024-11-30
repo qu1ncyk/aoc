@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+
+            let [crates, steps] = input.split("\n\n");
+            let crateRows = crates.split("\n");
+            let labels = crateRows[crateRows.length - 1];
+            console.log({crateRows, labels});
+
+            /** @type string[][] */
+            let stacks = [];
+
+            for (let i = 0; i < labels.length; i++) {
+                let label = labels[i];
+                console.log({label});
+                if (label === " ") {
+                    continue;
+                }
+
+                console.log({crateRows});
+
+                let stack = [];
+                for (let j = crateRows.length - 2; crateRows[j] && crateRows[j][i] != " "; j--) {
+                    stack.push(crateRows[j][i]);
+                }
+                stacks.push(stack);
+            }
+
+            let stepList = steps.split("\n");
+            stepList.forEach(step => {
+                let [_, amount, from, to] =
+                    /move (\d+) from (\d+) to (\d+)/.exec(step);
+
+                console.log({step, amount, to, from, stacks});
+
+                let movedCrates = [];
+                for (let i = 0; i < +amount; i++) {
+                    movedCrates.push(stacks[from - 1].pop());
+                }
+                while (movedCrates.length > 0) {
+                    stacks[to - 1].push(movedCrates.pop());
+                }
+            });
+
+            let stackTops = stacks.map(stack => stack[stack.length - 1]);
+
+            console.log(stackTops.join(""));
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            /* 1,2 -> 3,4
+             * 5,6
+             * becomes [[[1, 2], [3, 4]], [[5, 6]]]
+             */
+            let coordinates = input
+                .split("\n")
+                .map(
+                    x => x.split(" -> ")
+                        .map(x => x.split(",").map(Number))
+                );
+
+            let minX = 500, maxX = 500;
+            let minY = 0, maxY = 0;
+
+            coordinates.flat().forEach(([x, y]) => {
+                if (x < minX) {
+                    minX = x;
+                }
+                if (x > maxX) {
+                    maxX = x;
+                }
+                if (y < minY) {
+                    minY = y;
+                }
+                if (y > maxY) {
+                    maxY = y;
+                }
+            });
+
+            /** @type {string[]} */
+            let row = new Array(maxX - minX + 1).fill(".");
+            let grid = new Array(maxY - minY + 1).fill(0).map(_ => [...row]);
+
+            coordinates.forEach(rocks => {
+                let [prevX, prevY] = rocks.shift();
+                rocks.forEach(([x, y]) => {
+                    if (prevX === x) {
+                        for (let i = prevY; i !== y; i += Math.sign(y - prevY)) {
+                            grid[i - minY][x - minX] = "#";
+                        }
+                    } else {
+                        for (let i = prevX; i !== x; i += Math.sign(x - prevX)) {
+                            grid[y - minY][i - minX] = "#";
+                        }
+                    }
+                    prevX = x;
+                    prevY = y;
+                });
+                grid[prevY - minY][prevX - minX] = "#";
+            });
+
+            let sandsDropped = 0;
+            outer: while (true) {
+                let sand = { x: 500, y: 0 };
+                while (true) {
+                    if (sand.y === maxY || (grid[sand.y - minY + 1][sand.x - minX] !== "." && (
+                        sand.x === minX || grid[sand.y - minY + 1][sand.x - minX - 1] !== "."
+                        && sand.x === maxX
+                        ))) {
+                            break outer;
+                    }
+
+                    if (grid[sand.y - minY + 1][sand.x - minX] === ".") {
+                        sand.y++;
+                    } else if (grid[sand.y - minY + 1][sand.x - minX - 1] === ".") {
+                        sand.y++;
+                        sand.x--;
+                    } else if (grid[sand.y - minY + 1][sand.x - minX + 1] === ".") {
+                        sand.y++;
+                        sand.x++;
+                    } else {
+                        grid[sand.y - minY][sand.x - minX] = "o";
+                        break;
+                    }
+                }
+                sandsDropped++;
+            }
+
+            grid.forEach(x => console.log(x.join("")));
+            console.log({ sandsDropped });
+        }
+    </script>
+</body>
+
+</html>

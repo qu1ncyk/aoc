@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let grid = input.split("\n").map(x => x.split(""));
+
+            /** @type [number, number, number][] */
+            let stepQueue = [];
+            outer: for (let i = 0; i < grid.length; i++) {
+                for (let j = 0; j < grid[i].length; j++) {
+                    if (grid[i][j] === "S") {
+                        stepQueue.push([i, j, 0]);
+                        break outer;
+                    }
+                }
+            }
+            let endX, endY;
+
+            outer: while (stepQueue.length > 0) {
+                let [y, x, height] = stepQueue.shift();
+                const directions = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+                const arrows = ["^", "V", "<", ">"];
+
+                for (let i = 0; i < directions.length; i++) {
+                    let [dy, dx] = directions[i];
+
+                    if (x + dx === 46 && y + dy === 20) {
+                        debugger;
+                    }
+                    let newChar = grid[y + dy]?.[x + dx];
+                    if (newChar === undefined) {
+                        continue;
+                    }
+
+                    if (newChar === "E" && /*(height === 24 ||*/ height === 25) {
+                        endX = x;
+                        endY = y;
+                        break outer;
+
+                    } else if (newChar.match(/[a-z]/)) {
+                        let newHeight = newChar.charCodeAt(0) - 97;
+
+                        if (height + 1 >= newHeight) {
+                            stepQueue.push([y + dy, x + dx, newHeight]);
+                            if (grid[y + dy][x + dx] === "E")
+                                console.log({ overwrite: grid[y + dy][x + dx], arrow: arrows[i] });
+                            grid[y + dy][x + dx] = arrows[i];
+                        }
+                    }
+
+                }
+            }
+            grid.forEach(x => console.log(x.join("")));
+            if (endX === undefined || endY === undefined) {
+                console.log("not found");
+                return;
+            }
+
+            let char;
+            let i = 0;
+            do {
+                i++;
+                char = grid[endY][endX];
+                switch (char) {
+                    case "<":
+                        endX--;
+                        break;
+                    case ">":
+                        endX++;
+                        break;
+                    case "V":
+                        endY++;
+                        break;
+                    case "^":
+                        endY--;
+                        break;
+                }
+            } while (char !== "S");
+            console.log({ i });
+        }
+    </script>
+</body>
+
+</html>

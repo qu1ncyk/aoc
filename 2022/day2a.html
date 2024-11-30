@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        /* A/X: rock = 1
+         * B/Y: paper = 2
+         * C/Z: scissors = 3
+         * 
+         * win = 6
+         * draw = 3
+         * lost = 0
+         */
+        let points = {
+            "A X": 3 + 1,
+            "B X": 0 + 1,
+            "C X": 6 + 1,
+            "A Y": 6 + 2,
+            "B Y": 3 + 2,
+            "C Y": 0 + 2,
+            "A Z": 0 + 3,
+            "B Z": 6 + 3,
+            "C Z": 3 + 3
+        }
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+            let games = input.split("\n");
+            /** @type number[] */
+            let gamePoints = games.map(x => points[x]);
+            let total = gamePoints.reduce((total, x) => total + x);
+
+            console.log(total);
+        }
+    </script>
+</body>
+</html>

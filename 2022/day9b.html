@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        /** @param {{ x: number, y: number }[]} knots */
+        function printKnots(knots) {
+            let xs = knots.map(c => c.x);
+            let ys = knots.map(c => c.y);
+
+            let minX = Math.min(...xs);
+            let maxX = Math.max(...xs);
+            let minY = Math.min(...ys);
+            let maxY = Math.max(...ys);
+
+            let grid = new Array(maxY - minY + 1)
+                .fill(0)
+                .map(_ => new Array(maxX - minX + 1).fill(" "));
+
+            knots.forEach(({ x, y }, i) => {
+                grid[y - minY][x - minX] = String(i);
+            });
+
+            console.table(grid);
+        }
+
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let lines = input.split("\n");
+
+            let movements = lines.map(line => {
+                let [movement, amount] = line.split(" ");
+                return movement.repeat(amount).split("");
+            }).flat();
+
+            let origin = { x: 0, y: 0 };
+            /** @type {{ x: number, y: number }[]} */
+            let knots = new Array(10).fill(0).map(_ => ({ ...origin }));
+            let visited = new Set();
+
+            /** @type {{[key: string]: [number, number]}} */
+            const directions = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
+
+            movements.forEach(movement => {
+                let [dx, dy] = directions[movement];
+                knots[0].x += dx;
+                knots[0].y += dy;
+
+                for (let i = 1; i < knots.length; i++) {
+                    let head = knots[i - 1];
+                    let tail = knots[i];
+
+                    let { x, y } = tail;
+
+                    // if ((head.x - tail.x) ** 2 + (head.y - tail.y) ** 2 > 2) {
+                    //     tail.x = head.x - dx;
+                    //     tail.y = head.y - dy;
+
+                    //     dx = tail.x - x;
+                    //     dy = tail.y - y;
+                    // } else {
+                    //     break;
+                    // }
+
+                    if (Math.abs(head.x - tail.x) + Math.abs(head.y - tail.y) >= 4) {
+                        tail.x += (head.x - tail.x) / 2;
+                        tail.y += (head.y - tail.y) / 2;
+                    } else if (head.x - tail.x > 1) {
+                        tail.x++;
+                        tail.y = head.y;
+                    } else if (head.x - tail.x < -1) {
+                        tail.x--;
+                        tail.y = head.y;
+                    } else if (head.y - tail.y > 1) {
+                        tail.y++;
+                        tail.x = head.x;
+                    } else if (head.y - tail.y < -1) {
+                        tail.y--;
+                        tail.x = head.x;
+                    }
+
+                }
+                // printKnots(knots);
+
+                visited.add(`${knots[9].x},${knots[9].y}`);
+            });
+
+            console.log(visited.size, visited);
+        }
+    </script>
+</body>
+
+</html>

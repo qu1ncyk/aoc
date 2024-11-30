@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        class Directory {
+            /** @param {Directory} parent */
+            constructor(parent) {
+                /** @type {Directory} */
+                this.parent = parent;
+
+                /** @type {{[filename: string]: number}} */
+                this.files = {};
+
+                /** @type {{[dirname: string]: Directory}} */
+                this.dirs = {};
+            }
+
+            /** @param {string} dirname */
+            cd(dirname) {
+                switch (dirname) {
+                    case "..":
+                        return this.parent;
+                    case "/":
+                        return this;
+                    default:
+                        let newDir = new Directory(this);
+                        this.dirs[dirname] = newDir;
+                        return newDir;
+                }
+            }
+
+            /**
+             * @param {string} filename
+             * @param {number} size
+             */
+            add(filename, size) {
+                this.files[filename] = size;
+            }
+
+            root() {
+                let dir = this;
+                while (dir.parent !== null) {
+                    dir = dir.parent;
+                }
+                return dir;
+            }
+
+            filesizes() {
+                return Object.values(this.files)
+                    .reduce((total, x) => total + x, 0);
+            }
+        }
+
+        /**
+         * @param {Directory} dir
+         * @param {number[]} sizes
+         * @returns {number}
+         */
+        function allDirSizes(dir, sizes) {
+            let childSizes = Object.values(dir.dirs)
+                .map(child => allDirSizes(child, sizes))
+                .reduce((total, x) => total + x, 0);
+
+            let fileSizes = dir.filesizes();
+
+            let totalSize = childSizes + fileSizes;
+            sizes.push(totalSize);
+
+            return totalSize;
+        }
+
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+
+            let lines = input.split("\n");
+
+            let dir = new Directory(null);
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+
+                if (line.startsWith("$ cd ")) {
+                    let dirname = line.slice(5);
+                    dir = dir.cd(dirname);
+                } else if (line === "$ ls") {
+                    for (i++; lines[i] && !lines[i].startsWith("$"); i++) {
+                        let [size, filename] = lines[i].split(" ");
+                        if (size !== "dir") {
+                            dir.add(filename, +size);
+                        }
+                    }
+                    i--;
+                }
+            }
+
+            dir = dir.root();
+            let sizes = [];
+            allDirSizes(dir, sizes);
+
+            let answer = sizes
+                .filter(x => x <= 100000)
+                .reduce((total, x) => total + x);
+
+            console.log({ dir, sizes, answer });
+        }
+    </script>
+</body>
+
+</html>

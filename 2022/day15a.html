@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        /** @typedef {{ x: number, y: number }} coordinates */
+        class Sensor {
+            /**
+             * @param {coordinates} at
+             * @param {number} distance
+             */
+            constructor(at, distance) {
+                /** @type {coordinates} */
+                this.at = at;
+                /** @type {number} */
+                this.distance = distance;
+            }
+
+            /**
+             * @param {coordinates} at
+             * @param {coordinates} beacon
+             */
+            static fromBeacon(at, beacon) {
+                return new Sensor(at, Sensor.distance(at, beacon));
+            }
+
+            /**
+             * @param {coordinates} a
+             * @param {coordinates} b
+             */
+            static distance(a, b) {
+                return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+            }
+
+            /** @param {coordinates} spot */
+            inView(spot) {
+                let distance = Sensor.distance(this.at, spot);
+                return distance <= this.distance;
+            }
+        }
+
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let lines = input.split("\n");
+            let coordinates = lines.map(line => {
+                let match = /Sensor at x=(-?\d+), y=(-?\d+): closest beacon is at x=(-?\d+), y=(-?\d+)/
+                    .exec(line);
+                let [_, sensorX, sensorY, beaconX, beaconY] = match;
+                return [{ x: +sensorX, y: +sensorY }, { x: +beaconX, y: +beaconY }];
+            });
+            let xs = coordinates.flat().map(c => c.x);
+            let ys = coordinates.flat().map(c => c.y);
+            let min = { x: Math.min(...xs) - 1e6, y: Math.min(...ys) - 1e6 };
+            let max = { x: Math.max(...xs) + 1e6, y: Math.max(...ys) + 1e6 };
+
+            let sensors = coordinates
+                .map(([sensor, beacon]) => Sensor.fromBeacon(sensor, beacon));
+            let beacons = coordinates.map(c => c[1]);
+
+            let checkY = 2000000;
+            let count = 0;
+            for (let i = min.x; i < max.x; i++) {
+                let c = { x: i, y: checkY };
+                if (sensors.some(s => s.inView(c)) && !beacons.some(b => b.x === c.x && b.y === c.y)) {
+                    count++;
+                }
+            }
+
+            console.log({ count, sensors });
+        }
+    </script>
+</body>
+
+</html>

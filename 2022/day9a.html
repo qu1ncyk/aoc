@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let lines = input.split("\n");
+
+            let movements = lines.map(line => {
+                let [movement, amount] = line.split(" ");
+                return movement.repeat(amount).split("");
+            }).flat();
+
+            let head = { x: 0, y: 0 };
+            let tail = { x: 0, y: 0 };
+            let visited = new Set();
+
+            /** @type {{[key: string]: [number, number]}} */
+            const directions = { L: [-1, 0], R: [1, 0], U: [0, -1], D: [0, 1] };
+
+            movements.forEach(movement => {
+                let [dx, dy] = directions[movement];
+                head.x += dx;
+                head.y += dy;
+
+                /*if (head.x === tail.x) {
+                    if (head.y - tail.y === 2) {
+                        tail.y--;
+                    } else if (head.y - tail.y === -2) {
+                        tail.y++;
+                    }
+                } else if (head.y === tail.y) {
+                    if (head.x - tail.x === 2) {
+                        tail.x--;
+                    } else if (head.x - tail.x === -2) {
+                        tail.x++;
+                    }
+                } else */if ((head.x - tail.x)**2 + (head.y - tail.y)**2 > 2) {
+                    tail.x = head.x - dx;
+                    tail.y = head.y - dy;
+                }
+
+                visited.add(`${tail.x},${tail.y}`);
+            });
+
+            console.log(visited.size, visited);
+        }
+    </script>
+</body>
+
+</html>

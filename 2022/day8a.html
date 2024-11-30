@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        /**
+         * @param {string[]} lines
+         * @param {number} x
+         * @param {number} y
+         * @param {number} dx
+         * @param {number} dy
+         */
+        function look(lines, x, y, dx, dy) {
+            let height = lines[y][x];
+            x += dx;
+            y += dy;
+            while (lines[y] !== undefined && lines[y][x] !== undefined) {
+                let newHeight = lines[y][x];
+                if (newHeight >= height) {
+                    return false;
+                }
+
+                x += dx;
+                y += dy;
+            }
+            return true;
+        }
+
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let lines = input.split("\n");
+
+            let directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            let visible = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                for (let j = 0; j < lines[i].length; j++) {
+                    for (let k = 0; k < directions.length; k++) {
+                        let [dx, dy] = directions[k];
+                        if (look(lines, j, i, dx, dy)) {
+                            visible++;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            console.log(visible);
+        }
+    </script>
+</body>
+
+</html>

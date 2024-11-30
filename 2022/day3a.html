@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type string */
+            let input = document.querySelector("#input").value;
+
+            let rucksacks = input.split("\n");
+            /** @type [string, string][] */
+            let compartiments = rucksacks.map(r =>
+                [r.slice(0, r.length / 2), r.slice(r.length / 2)]
+            );
+
+            let duplicates = compartiments.map(([c1, c2]) => {
+                for (let i = 0; i < c1.length; i++) {
+                    if (c2.indexOf(c1[i]) > -1) {
+                        // char is in c2
+                        return c1[i];
+                    }
+                }
+                return " ";
+            });
+
+            let priorities = duplicates.map(d => {
+                let charCode = d.charCodeAt(0);
+                if (charCode >= 65 && charCode <= 65 + 25) {
+                    return charCode - 65 + 27;
+                } else if (charCode >= 97 && charCode <= 97 + 25) {
+                    return charCode - 97 + 1;
+                } else {
+                    return 0;
+                }
+            });
+
+            let sum = priorities.reduce((total, x) => total + x);
+
+            console.log({rucksacks, compartiments, duplicates, priorities});
+            console.log(sum);
+        }
+    </script>
+</body>
+
+</html>

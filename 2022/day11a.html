@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        class Monkey {
+            constructor() {
+                /** @type {number[]} */
+                this.items = [];
+                /** @type {(item: number) => number} */
+                this.operation = x => x;
+                /** @type {number} */
+                this.divisibleBy = 1;
+                /** @type {number} */
+                this.throwTrue = 0;
+                /** @type {number} */
+                this.throwFalse = 0;
+                /** @type {number} */
+                this.totalInspected = 0;
+            }
+
+            /** @param {string[]} lines */
+            static parse(lines) {
+                let monkey = new Monkey();
+
+                monkey.items = lines[1]
+                    .replace(/  Starting items: /, "")
+                    .split(", ")
+                    .map(Number);
+
+                let [_, operation, number] =
+                    /  Operation: new = old (\*|\+) (\d+|old)/.exec(lines[2]);
+                if (operation === "*" && number === "old") {
+                    monkey.operation = x => x * x;
+                } else if (operation === "*" && number !== "old") {
+                    monkey.operation = x => x * Number(number);
+                } else if (operation === "+" && number === "old") {
+                    monkey.operation = x => x + x;
+                } else if (operation === "+" && number !== "old") {
+                    monkey.operation = x => x + Number(number);
+                }
+
+                monkey.divisibleBy = +lines[3]
+                    .replace(/  Test: divisible by /, "");
+
+                monkey.throwTrue = +lines[4]
+                    .replace(/    If true: throw to monkey /, "");
+
+                monkey.throwFalse = +lines[5]
+                    .replace(/    If false: throw to monkey /, "");
+
+                return monkey;
+            }
+
+            /** @param {number} item */
+            inspect(item) {
+                this.totalInspected++;
+
+                item = this.operation(item);
+                item = Math.floor(item / 3);
+                if (item % this.divisibleBy === 0) {
+                    return [item, this.throwTrue];
+                } else {
+                    return [item, this.throwFalse];
+                }
+            }
+
+            /** @param {Monkey[]} allMonkeys */
+            inspectAll(allMonkeys) {
+                while (this.items.length > 0) {
+                    let item = this.items.shift();
+                    let [newItem, monkeyNumber] = this.inspect(item);
+                    allMonkeys[monkeyNumber].items.push(newItem);
+                }
+            }
+        }
+
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let monkeys = input
+                .split("\n\n")
+                .map(lines => lines.split("\n"))
+                .map(lineArray => Monkey.parse(lineArray));
+
+            for (let i = 0; i < 20; i++) {
+                monkeys.forEach(monkey => {
+                    monkey.inspectAll(monkeys);
+                });
+            }
+
+            monkeys.sort((a, b) => a.totalInspected - b.totalInspected);
+            monkeys.reverse();
+
+            console.log(monkeys[0].totalInspected * monkeys[1].totalInspected);
+        }
+    </script>
+</body>
+
+</html>

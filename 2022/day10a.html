@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea id="input"></textarea>
+    <button onclick="go();">go</button>
+    <script>
+        function go() {
+            /** @type {string} */
+            let input = document.querySelector("#input").value;
+            let lines = input.split("\n");
+
+            let instructions = lines
+                .map(line => line.startsWith("addx") ? ["noop", line] : line)
+                .flat();
+
+            let signalStrength = 0;
+
+            let x = 1;
+            instructions.forEach((instruction, i) => {
+                let [command, value] = instruction.split(" ");
+
+                if ([20, 60, 100, 140, 180, 220].includes(i + 1)) {
+                    signalStrength += (i + 1) * x;
+                    console.log({instruction, i: i + 1, x});
+                }
+
+                if (command === "addx") {
+                    x += Number(value);
+                }
+            });
+
+            console.log({signalStrength, instructions});
+        }
+    </script>
+</body>
+
+</html>
