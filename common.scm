@@ -16,3 +16,10 @@
 
 (define (split-lines str)
   (drop-right (string-split str #\lf) 1))
+
+(define (split-row str)
+  (filter
+    (lambda (x) (not (equal? x "")))
+    (concatenate
+      (map (lambda (x) (string-split x #\sp))
+           (string-split str #\tab)))))
