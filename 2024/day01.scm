@@ -1,11 +1,11 @@
 (load "../common.scm")
 
+(define (parse input)
+  (map-2d string->number (parse-2d input)))
+
 (define (part1 input)
   (let*
-    ([parsed
-       (map
-         (proc-concat (curry map string->number) split-row)
-         (split-lines input))]
+    ([parsed (parse input)]
      [zipped (apply zip parsed)]
      [sorted (map (lambda (x) (sort x <)) zipped)]
      [unzipped (apply zip sorted)]
@@ -16,14 +16,12 @@
 
 (define (part2 input)
   (let*
-    ([parsed
-       (map
-         (proc-concat (curry map string->number) split-row)
-         (split-lines input))]
+    ([parsed (parse input)]
      [zipped (apply zip parsed)]
-     [appearances (map
-               (lambda (left) (count (curry = left) (cadr zipped)))
-               (car zipped))]
+     [appearances
+       (map
+         (lambda (left) (count (curry = left) (cadr zipped)))
+         (car zipped))]
      [scores (map (curry apply *) (zip appearances (car zipped)))]
      [result (apply + scores)])
     result))

@@ -23,3 +23,9 @@
     (concatenate
       (map (lambda (x) (string-split x #\sp))
            (string-split str #\tab)))))
+
+(define (parse-2d input)
+  (map split-row (split-lines input)))
+
+(define (map-2d f 2d-list)
+  (map (curry map f) 2d-list))
