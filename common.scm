@@ -5,7 +5,7 @@
   (call-with-input-file filename get-string-all))
 
 (define (curry f . args)
-  (lambda x (apply f (concatenate (list args x)))))
+  (lambda x (apply f (concatenate* args x))))
 
 (define (proc-concat . procs)
   (lambda x
@@ -29,3 +29,13 @@
 
 (define (map-2d f 2d-list)
   (map (curry map f) 2d-list))
+
+(define-syntax debug
+  (syntax-rules ()
+    [(debug . expr)
+     (begin
+       (display 'expr)
+       (display " = ")
+       (display expr)
+       (newline)
+       expr)]))
