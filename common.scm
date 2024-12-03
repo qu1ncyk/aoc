@@ -5,7 +5,7 @@
   (call-with-input-file filename get-string-all))
 
 (define (curry f . args)
-  (lambda x (apply f (concatenate* args x))))
+  (lambda x (apply f (append args x))))
 
 (define (proc-concat . procs)
   (lambda x
