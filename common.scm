@@ -1,4 +1,5 @@
 (use-modules (ice-9 textual-ports))
+(use-modules (ice-9 match))
 (use-modules (srfi srfi-1))
 
 (define (read-file filename)
@@ -39,3 +40,20 @@
        (display expr)
        (newline)
        expr)]))
+
+(define (regexp-split str regexp)
+  (let*
+    ([placeholder "€"]
+     [replaced
+       (regexp-substitute/global #f regexp str 'pre placeholder 'post)]
+     [split (string-split replaced (string->char-set placeholder))])
+    split))
+
+(define (list-unique l)
+  (fold
+    (lambda (x acc)
+      (if (member x acc)
+        acc
+        (cons x acc)))
+    '()
+    l))
