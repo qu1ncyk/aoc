@@ -1,5 +1,7 @@
 (use-modules (ice-9 textual-ports))
 (use-modules (ice-9 match))
+(use-modules (ice-9 threads))
+(use-modules (ice-9 vlist))
 (use-modules (srfi srfi-1))
 
 (define (read-file filename)
@@ -57,3 +59,22 @@
         (cons x acc)))
     '()
     l))
+
+(define (list-set l i x)
+  (let
+    ([front (take l i)]
+     [back (drop l (+ i 1))])
+    (append front (list x) back)))
+
+(define (string-set s i x)
+  (let*
+    ([l (string->list s)]
+     [l' (list-set l i x)])
+    (list->string l')))
+
+(define (par-filter p l)
+  (let*
+    ([bools (par-map p l)]
+     [zipped (zip l bools)]
+     [filtered (filter cadr zipped)])
+    (map car filtered)))
