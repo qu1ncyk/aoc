@@ -95,14 +95,8 @@
     ([parsed (parse input)]
      [start (start-pos parsed)]
      [history (walk* (list->vlist '()) parsed start '(0 -1))]
-     [obstacle-places (find-obstacle-places parsed history)]
-     )
-    (length (list-unique obstacle-places))
-    ;(list-unique (vhash-fold
-    ;  (lambda (state _ acc) (cons (car state) acc))
-    ;   '()
-    ;   history))
-    ))
+     [obstacle-places (find-obstacle-places parsed history)])
+    (length (list-unique obstacle-places))))
 
 ;(part2 "....#.....
 ;.........#
