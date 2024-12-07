@@ -10,6 +10,9 @@
 (define (curry f . args)
   (lambda x (apply f (append args x))))
 
+(define (curry* f . args)
+  (lambda x (apply f (append x args))))
+
 (define (proc-concat . procs)
   (lambda x
     (fold-right
@@ -78,3 +81,18 @@
      [zipped (zip l bools)]
      [filtered (filter cadr zipped)])
     (map car filtered)))
+
+(define (list-product2 l1 l2)
+  (concatenate
+    (map
+      (lambda (x1)
+        (map
+          (lambda (x2) (cons x1 x2))
+          l2))
+      l1)))
+
+(define (list-product . l)
+  (fold-right list-product2 '(()) l))
+
+(define (repeat x n)
+  (map (const x) (iota n)))
