@@ -3,6 +3,7 @@
 (use-modules (ice-9 threads))
 (use-modules (ice-9 vlist))
 (use-modules (srfi srfi-1))
+(use-modules (srfi srfi-9 gnu))
 
 (define (read-file filename)
   (call-with-input-file filename get-string-all))
@@ -96,3 +97,60 @@
 
 (define (repeat x n)
   (map (const x) (iota n)))
+
+(define (enumerate l)
+  (map
+    (lambda (x) (cons (car x) (cadr x)))
+    (zip (iota (length l)) l)))
+
+(define (enumerate-2d l)
+  (apply zip (map enumerate (apply zip (map enumerate l)))))
+
+(define (list->pair l)
+  (cons (car l) (cadr l)))
+
+(define (make-2w-dict)
+  (cons (alist->vhash '()) (alist->vhash '())))
+
+(define (2w-dict-cons key val dict)
+  (cons
+    (vhash-cons key val (car dict))
+    (vhash-cons val key (cdr dict))))
+
+(define (2w-dict-ref-key key dict)
+    (cdr (vhash-assoc key (car dict))))
+
+(define (2w-dict-ref-val val dict)
+    (cdr (vhash-assoc val (cdr dict))))
+
+(define (2w-dict-ref-key* key dict)
+    (vhash-fold* cons '() key (car dict)))
+
+(define (2w-dict-ref-val* val dict)
+    (vhash-fold* cons '() val (cdr dict)))
+
+(define (2w-dict->alist dict)
+  (vhash-fold
+    (lambda (key val acc) (cons (cons key val) acc))
+    '()
+    (car dict)))
+
+(define-immutable-record-type grid
+  (make-grid dict width height)
+  grid?
+  (dict grid-dict set-grid-dict)
+  (width grid-width set-grid-width)
+  (height grid-height set-grid-height))
+
+(define (grid-parse lines)
+  (let*
+    ([chars (map string->list lines)]
+     [height (length chars)]
+     [width (length (car chars))]
+     [dict
+       (fold
+         (match-lambda* [((y x . c) dict)
+           (2w-dict-cons (cons x y) c dict)])
+         (make-2w-dict)
+         (concatenate (enumerate-2d chars)))])
+    (make-grid dict width height)))
